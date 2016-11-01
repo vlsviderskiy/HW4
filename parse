@@ -38,8 +38,10 @@ print(table_['Plate 4']['Patient ID'])
 
 for tablenum in table_:  #tablenum will call each table
     for item in range(len(table_[tablenum])): #Go through each row for the length of each table, item is row number
-        #Create column for 'Dilution'
-        if '1000000' in table_[tablenum].ix[item, 0]:
+        #Create column for 'Visit Number'
+        if '10000000' in table_[tablenum].ix[item, 0]:
+            table_[tablenum].ix[item, "Dilution"] = 10000000
+        elif '1000000' in table_[tablenum].ix[item, 0]:
             table_[tablenum].ix[item, "Dilution"] = 1000000
         elif '100000' in table_[tablenum].ix[item, 0]:
             table_[tablenum].ix[item, "Dilution"] = 100000
