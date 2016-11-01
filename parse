@@ -9,8 +9,18 @@ table_ = pd.read_excel('06222016 Staph Array Data.xlsx', sheetname = ['Plate 1',
 #print(table_['Plate 1'])
 
 
-for item in range(len(table_['Plate 1'])):
-    table_['Plate 1'].ix[item,"Patient ID"] = table_['Plate 1'].ix[item, 0][0:5]
+#A for loop going through each table to create columns with patient ID, visit number, and titer
+
+for tablenum in table_:
+    for item in range(len(table_[tablenum])):
+        table_[tablenum].ix[item,"Patient ID"] = table_[tablenum].ix[item, 0][0:5]
+        if ('V1' in table_[tablenum].ix[item, 0]) or ('v1' in table_[tablenum].ix[item, 0]):
+            table_[tablenum].ix[item, "Visit Number"] = 1
+        elif ('V2' in table_[tablenum].ix[item, 0]) or ('v2' in table_[tablenum].ix[item, 0]):
+            table_[tablenum].ix[item, "Visit Number"] = 2
+        elif ('V3' in table_[tablenum].ix[item, 0]) or ('v3' in table_[tablenum].ix[item, 0]):
+            table_[tablenum].ix[item, "Visit Number"] = 3
+
+print(table_['Plate 2']['Visit Number'])
 
 
-print(table_['Plate 1']['Patient ID'])
