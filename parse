@@ -21,6 +21,20 @@ for tablenum in table_:
         elif ('V3' in table_[tablenum].ix[item, 0]) or ('v3' in table_[tablenum].ix[item, 0]):
             table_[tablenum].ix[item, "Visit Number"] = 3
 
+    for item in range(len(table_[tablenum])):
+        if 'Standard' in table_[tablenum].ix[item, 0]:
+            table_[tablenum].ix[item, "Patient ID"] = 'Standard'
+        elif 'Healthy' in table_[tablenum].ix[item, 0]:
+            table_[tablenum].ix[item, "Patient ID"] = 'Healthy'
+        elif 'Vander' in table_[tablenum].ix[item, 0]:
+            table_[tablenum].ix[item, "Patient ID"] = 'Vander'
+        else:
+            table_[tablenum].ix[item, "Patient ID"] = table_[tablenum].ix[item, 0][0:5]
+
+
+
 print(table_['Plate 2']['Visit Number'])
 
+
+print(table_['Plate 4']['Patient ID'])
 
