@@ -1,14 +1,16 @@
-import pandas
+import pandas as pd
 
 
-table_ = pandas.read_excel('06222016 Staph Array Data.xlsx', sheetname = ['Plate 1','Plate 2','Plate 3','Plate 4','Plate 5','Plate6','Plate7','Plate8','Plate9','Plate10','Plate11'], skiprows = 1)
+table_ = pd.read_excel('06222016 Staph Array Data.xlsx', sheetname = ['Plate 1','Plate 2','Plate 3','Plate 4','Plate 5','Plate6','Plate7','Plate8','Plate9','Plate10','Plate11'], skiprows = 1)
 #import table as a dictionary of tables named table_
     # each table is called by its name, for plates after number 5 there is no space between plate and the number
 
 
 #print(table_['Plate 1'])
 
-#for item in table_['Plate 1']:
-    #table_['Plate 1']["Patient ID"] = table_['Plate 1'][item][0:5]
-   # print(item)
-#print(table_['Plate 1'])
+
+for item in range(len(table_['Plate 1'])):
+    table_['Plate 1'].ix[item,"Patient ID"] = table_['Plate 1'].ix[item, 0][0:5]
+
+
+print(table_['Plate 1']['Patient ID'])
