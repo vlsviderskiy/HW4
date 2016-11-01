@@ -1,0 +1,7 @@
+import pandas
+
+
+table_ = pandas.read_excel('06222016 Staph Array Data.xlsx', sheetname = [0,1,2,3,4,5,6,7,8,9,10])
+#import table as a dictionary of tables named table_
+
+print(table_[9])
