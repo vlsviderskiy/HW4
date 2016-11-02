@@ -94,4 +94,5 @@ os.chdir('Updated Files') #Change directory to output new files in updated files
 #Generate tsv files for each plate with the updated columns and information
 for tablenum in table_:
     table_[tablenum].to_csv(tablenum + '.tsv', sep='\t')
-    
+
+
