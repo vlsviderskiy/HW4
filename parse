@@ -25,8 +25,10 @@ for tablenum in table_:  #tablenum will call each table
             table_[tablenum].ix[item, "Patient ID"] = 'Standard'
         elif 'Healthy' in table_[tablenum].ix[item, 0]:
             table_[tablenum].ix[item, "Patient ID"] = 'Healthy'
-        elif 'Vander' in table_[tablenum].ix[item, 0]:
-            table_[tablenum].ix[item, "Patient ID"] = 'Vander'
+        elif 'VANDER' in table_[tablenum].ix[item, 0]:
+            table_[tablenum].ix[item, "Patient ID"] = table_[tablenum].ix[item, 0][0:9]
+        elif 'HSS' in table_[tablenum].ix[item, 0]:
+            table_[tablenum].ix[item, "Patient ID"] = table_[tablenum].ix[item, 0][0:9]
         else:
             table_[tablenum].ix[item, "Patient ID"] = table_[tablenum].ix[item, 0][0:5]
 
