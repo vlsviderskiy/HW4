@@ -1,5 +1,5 @@
 import pandas as pd
-
+import os
 
 table_ = pd.read_excel('06222016 Staph Array Data.xlsx', sheetname = ['Plate 1','Plate 2','Plate 3','Plate 4','Plate 5','Plate6','Plate7','Plate8','Plate9','Plate10','Plate11'], skiprows = 1)
 #import table as a dictionary of tables named table_
@@ -88,4 +88,10 @@ for tablenum in table_:  #tablenum will call each table
             table_[tablenum].ix[item, "Gender"] = Gend_Dict[table_[tablenum].ix[item, "Patient ID"]]
 
 
+os.makedirs('Updated Files')
+os.chdir('Updated Files') #Change directory to output new files in updated files folder
 
+#Generate tsv files for each plate with the updated columns and information
+for tablenum in table_:
+    table_[tablenum].to_csv(tablenum + '.tsv', sep='\t')
+    
