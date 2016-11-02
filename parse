@@ -2,29 +2,35 @@ import pandas as pd
 import os
 
 table_ = pd.read_excel('06222016 Staph Array Data.xlsx', sheetname = ['Plate 1','Plate 2','Plate 3','Plate 4','Plate 5','Plate6','Plate7','Plate8','Plate9','Plate10','Plate11'], skiprows = 1)
-#import table as a dictionary of tables named table_
+# import table as a dictionary of tables named table_
     # each table is called by its name, for plates after number 5 there is no space between plate and the number
 
 
-#print(table_['Plate 1'])
+# print(table_['Plate 1'])
 
 
-#A for loop going through each table to create columns with patient ID, visit number, and titer
+# A for loop going through each table to create columns with patient ID, visit number, and titer
 
-for tablenum in table_:  #tablenum will call each table
-    for item in range(len(table_[tablenum])): #Go through each row for the length of each table, item is row number
-        #Create column for 'Visit Number'
+for tablenum in table_:  # tablenum will call each table
+    for item in range(len(table_[tablenum])):  # Go through each row for the length of each table, item is row number
+        # Create column for 'Visit Number'
         if ('V1' in table_[tablenum].ix[item, 0]) or ('v1' in table_[tablenum].ix[item, 0]):
             table_[tablenum].ix[item, "Visit Number"] = 1
         elif ('V2' in table_[tablenum].ix[item, 0]) or ('v2' in table_[tablenum].ix[item, 0]):
             table_[tablenum].ix[item, "Visit Number"] = 2
         elif ('V3' in table_[tablenum].ix[item, 0]) or ('v3' in table_[tablenum].ix[item, 0]):
             table_[tablenum].ix[item, "Visit Number"] = 3
-        #Create Column for 'Patient ID'
+        elif ('62900   ' in table_[tablenum].ix[item, 0]) or ('17588   ' in table_[tablenum].ix[item, 0]):
+            table_[tablenum].ix[item, "Visit Number"] = 1
+        else:
+            table_[tablenum].ix[item, "Visit Number"] = 1
+        # Create Column for 'Patient ID'
         if 'Standard' in table_[tablenum].ix[item, 0]:
             table_[tablenum].ix[item, "Patient ID"] = 'Standard'
-        elif 'Healthy' in table_[tablenum].ix[item, 0]:
-            table_[tablenum].ix[item, "Patient ID"] = 'Healthy'
+        elif 'GS' in table_[tablenum].ix[item, 0]:
+            table_[tablenum].ix[item, "Patient ID"] = table_[tablenum].ix[item, 0][0:11]
+        elif 'JM' in table_[tablenum].ix[item, 0]:
+            table_[tablenum].ix[item, "Patient ID"] = table_[tablenum].ix[item, 0][0:10]
         elif 'VANDER' in table_[tablenum].ix[item, 0]:
             table_[tablenum].ix[item, "Patient ID"] = table_[tablenum].ix[item, 0][0:9]
         elif 'HSS' in table_[tablenum].ix[item, 0]:
@@ -32,15 +38,15 @@ for tablenum in table_:  #tablenum will call each table
         else:
             table_[tablenum].ix[item, "Patient ID"] = table_[tablenum].ix[item, 0][0:5]
 
-#print(table_['Plate 2']['Visit Number'])
+# print(table_['Plate 2']['Visit Number'])
 
 
-#print(table_['Plate 4']['Patient ID'])
+# print(table_['Plate 4']['Patient ID'])
 
 
-for tablenum in table_:  #tablenum will call each table
-    for item in range(len(table_[tablenum])): #Go through each row for the length of each table, item is row number
-        #Create column for 'Dilution'
+for tablenum in table_:  # tablenum will call each table
+    for item in range(len(table_[tablenum])):  # Go through each row for the length of each table, item is row number
+        # Create column for 'Dilution'
         if '10000000' in table_[tablenum].ix[item, 0]:
             table_[tablenum].ix[item, "Dilution"] = 10000000
         elif '1000000' in table_[tablenum].ix[item, 0]:
@@ -59,8 +65,7 @@ for tablenum in table_:  #tablenum will call each table
             continue
 
 
-
-#Generate dictionaries of Hospital, Age, and Gender for each Patient ID
+# Generate dictionaries of Hospital, Age, and Gender for each Patient ID
 
 Hosp_Dict = {}
 Age_Dict = {}
@@ -68,7 +73,7 @@ Gend_Dict = {}
 
 for tablenum in table_:
     for item in range(len(table_[tablenum])):
-        if not tablenum == 'Plate11': #Plate 11 does not have this information
+        if not tablenum == 'Plate11':  # Plate 11 does not have this information
             if not table_[tablenum].ix[item, "Patient ID"] in Hosp_Dict:
                 if not table_[tablenum].ix[item, "Hospital "] == 'NaN':
                     Hosp_Dict[table_[tablenum].ix[item, "Patient ID"]] = table_[tablenum].ix[item, 'Hospital ']
@@ -79,21 +84,21 @@ for tablenum in table_:
                 if not table_[tablenum].ix[item, "Gender"] == 'NaN':
                     Gend_Dict[table_[tablenum].ix[item, "Patient ID"]] = table_[tablenum].ix[item, 'Gender']
 
-#Fill all the Hospital, Age, and Gender information in for every row that has a unique ID
+# Fill all the Hospital, Age, and Gender information in for every row that has a unique ID
 
-for tablenum in table_:  #tablenum will call each table
-    for item in range(len(table_[tablenum])): #Go through each row for the length of each table, item is row number
+for tablenum in table_:  # tablenum will call each table
+    for item in range(len(table_[tablenum])):  # Go through each row for the length of each table, item is row number
         if not tablenum == 'Plate11':
-            #if table_[tablenum].ix[item, "Hospital "] == 'NaN':
+            # if table_[tablenum].ix[item, "Hospital "] == 'NaN':
             table_[tablenum].ix[item, "Hospital "] = Hosp_Dict[table_[tablenum].ix[item, "Patient ID"]]
             table_[tablenum].ix[item, "Age"] = Age_Dict[table_[tablenum].ix[item, "Patient ID"]]
             table_[tablenum].ix[item, "Gender"] = Gend_Dict[table_[tablenum].ix[item, "Patient ID"]]
 
 
 os.makedirs('Updated Files')
-os.chdir('Updated Files') #Change directory to output new files in updated files folder
+os.chdir('Updated Files')  # Change directory to output new files in updated files folder
 
-#Generate tsv files for each plate with the updated columns and information
+# Generate tsv files for each plate with the updated columns and information
 for tablenum in table_:
     table_[tablenum].to_csv(tablenum + '.tsv', sep='\t')
 
