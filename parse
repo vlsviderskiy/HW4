@@ -65,6 +65,9 @@ for tablenum in table_:  # tablenum will call each table
         else:
             continue
 
+# Fix Plate 5 ID 84504, which has running mistakes in ID number and Visit Number at points
+table_["Plate 5"].ix[40:42, 'Patient ID'] = '84504'
+table_["Plate 5"].ix[44:46, 'Visit Number'] = 3.0
 
 # Generate dictionaries of Hospital, Age, and Gender for each Patient ID
 
@@ -108,17 +111,21 @@ os.makedirs('Graphs')
 os.chdir('Graphs')
 
 
-# Fix Plate 5 ID 84504, which has running mistakes in ID number and Visit Number at points
-table_["Plate 5"].ix[40:42, 'Patient ID'] = '84504'
-table_["Plate 5"].ix[44:46, 'Visit Number'] = 3.0
+#Fix Patient 27986 being in Plate8 and Plate9
+moved_27986_dict = table_.copy()
+patient27986_mask = moved_27986_dict["Plate9"].ix[3:6,:]
 
-for plate in table_:  # Iterate through each plate
+moved_27986_dict["Plate9"] = moved_27986_dict["Plate9"][moved_27986_dict["Plate9"]["Patient ID"] != "27986"]
+moved_27986_dict["Plate8"]= moved_27986_dict["Plate8"].append(patient27986_mask, ignore_index=True)
+
+
+for plate in moved_27986_dict:  # Iterate through each plate
 
     os.makedirs(plate)
     os.chdir(plate)
     # make a list of patient IDs
 
-    d = table_[plate]
+    d = moved_27986_dict[plate]
     list_of_patientids = []
     for patient in d["Patient ID"]:
         if patient not in list_of_patientids:
