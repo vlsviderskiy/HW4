@@ -1,5 +1,6 @@
 import pandas as pd
 import os
+import matplotlib.pyplot as plt
 
 table_ = pd.read_excel('06222016 Staph Array Data.xlsx', sheetname = ['Plate 1','Plate 2','Plate 3','Plate 4','Plate 5','Plate6','Plate7','Plate8','Plate9','Plate10','Plate11'], skiprows = 1)
 # import table as a dictionary of tables named table_
@@ -101,5 +102,82 @@ os.chdir('Updated Files')  # Change directory to output new files in updated fil
 # Generate tsv files for each plate with the updated columns and information
 for tablenum in table_:
     table_[tablenum].to_csv(tablenum + '.tsv', sep='\t')
+
+os.chdir('..')
+os.makedirs('Graphs')
+os.chdir('Graphs')
+
+
+# Fix Plate 5 ID 84504, which has running mistakes in ID number and Visit Number at points
+table_["Plate 5"].ix[40:42, 'Patient ID'] = '84504'
+table_["Plate 5"].ix[44:46, 'Visit Number'] = 3.0
+
+for plate in table_:  # Iterate through each plate
+
+    os.makedirs(plate)
+    os.chdir(plate)
+    # make a list of patient IDs
+
+    d = table_[plate]
+    list_of_patientids = []
+    for patient in d["Patient ID"]:
+        if patient not in list_of_patientids:
+            list_of_patientids.append(patient)
+
+    # Make dictionary of masked data_frames for each visit number
+    mask_dict = {}
+    mask_dict1 = {}
+    mask_dict2 = {}
+    mask_dict3 = {}
+    count2 = 0
+    count3 = 0
+    for patientid in list_of_patientids:
+        x = (d["Patient ID"] == patientid)
+        y1 = (d['Visit Number'] == 1.0)
+        y2 = (d['Visit Number'] == 2.0)
+        y3 = (d['Visit Number'] == 3.0)
+        mask_dict[patientid] = d.ix[x, :]
+        mask_dict1[patientid] = mask_dict[patientid].ix[y1, :]
+        a = 0
+        for index, row in mask_dict[patientid].iterrows():  # Make sure there is a V2 for the Patient ID
+            if (row['Visit Number']) == 2.0:
+                a = 1
+            count2 += 1
+        if a == 1:
+            mask_dict2[patientid] = mask_dict[patientid].ix[y2, :]
+
+        b = 0
+        for index, row in mask_dict[patientid].iterrows():  # Make sure there is a V3 for the Patient ID
+            if (row['Visit Number']) == 3.0:
+                b = 1
+            count3 += 1
+        if b == 1:
+            mask_dict3[patientid] = mask_dict[patientid].ix[y3, :]
+
+    for patientid in list_of_patientids:  # Iterate through each patientID and plot the graphs
+        if patientid != 'Standard' and patientid != '27986':
+            fig = plt.figure(figsize=(10, 8))
+            plt.plot(mask_dict1[patientid].ix[:, ['Dilution']], mask_dict1[patientid].ix[:, ['PC4']], label='V1',
+                     marker=('o'))
+            if patientid in mask_dict2:
+                plt.plot(mask_dict2[patientid].ix[:, ['Dilution']], mask_dict2[patientid].ix[:, ['PC4']], label='V2',
+                         marker=('v'))
+            if patientid in mask_dict3:
+                plt.plot(mask_dict3[patientid].ix[:, ['Dilution']], mask_dict3[patientid].ix[:, ['PC4']], label='V3',
+                         marker=('*'))
+            plt.yscale('log')
+            plt.xscale('log')
+            plt.xlabel('Dilution')
+            plt.ylabel('Intensity')
+            plt.title(plate + '_' + patientid + '_PC4')
+            plt.legend(loc=1)
+            plt.savefig(plate + '_' + patientid + '_PC4')
+            plt.close()
+
+
+    os.chdir('..')
+
+
+
 
 
