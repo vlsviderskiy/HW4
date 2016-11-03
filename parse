@@ -98,8 +98,8 @@ for tablenum in table_:  # tablenum will call each table
             table_[tablenum].ix[item, "Age"] = Age_Dict[table_[tablenum].ix[item, "Patient ID"]]
             table_[tablenum].ix[item, "Gender"] = Gend_Dict[table_[tablenum].ix[item, "Patient ID"]]
 
-
-os.makedirs('Updated Files')
+if not 'Updated Files' in os.listdir('.'):
+    os.makedirs('Updated Files')
 os.chdir('Updated Files')  # Change directory to output new files in updated files folder
 
 # Generate tsv files for each plate with the updated columns and information
@@ -107,7 +107,8 @@ for tablenum in table_:
     table_[tablenum].to_csv(tablenum + '.tsv', sep='\t')
 
 os.chdir('..')
-os.makedirs('Graphs')
+if not 'Graphs' in os.listdir('.'):
+    os.makedirs('Graphs')
 os.chdir('Graphs')
 
 
@@ -121,7 +122,8 @@ moved_27986_dict["Plate8"]= moved_27986_dict["Plate8"].append(patient27986_mask,
 
 for plate in moved_27986_dict:  # Iterate through each plate
 
-    os.makedirs(plate)
+    if not plate in os.listdir('.'):
+        os.makedirs(plate)
     os.chdir(plate)
     # make a list of patient IDs
 
@@ -130,6 +132,22 @@ for plate in moved_27986_dict:  # Iterate through each plate
     for patient in d["Patient ID"]:
         if patient not in list_of_patientids:
             list_of_patientids.append(patient)
+
+    # make a list of column values
+    column_values = list(d.columns.values)
+    list_of_columns = column_values[4:53]
+
+    print(list_of_columns)
+
+    for num1, test in enumerate(list_of_columns):
+        if '.' in test:
+            for num2, letter in enumerate(test):
+                if letter == '.':
+                    list_of_columns[num1] = test[0:num2] + ' ' + test[num2+1:len(test)]
+
+    print(list_of_columns)
+
+
 
     # Make dictionary of masked data_frames for each visit number
     mask_dict = {}
@@ -162,24 +180,33 @@ for plate in moved_27986_dict:  # Iterate through each plate
             mask_dict3[patientid] = mask_dict[patientid].ix[y3, :]
 
     for patientid in list_of_patientids:  # Iterate through each patientID and plot the graphs
-        if patientid != 'Standard' and patientid != '27986':
-            fig = plt.figure(figsize=(10, 8))
-            plt.plot(mask_dict1[patientid].ix[:, ['Dilution']], mask_dict1[patientid].ix[:, ['PC4']], label='V1',
-                     marker=('o'))
-            if patientid in mask_dict2:
-                plt.plot(mask_dict2[patientid].ix[:, ['Dilution']], mask_dict2[patientid].ix[:, ['PC4']], label='V2',
-                         marker=('v'))
-            if patientid in mask_dict3:
-                plt.plot(mask_dict3[patientid].ix[:, ['Dilution']], mask_dict3[patientid].ix[:, ['PC4']], label='V3',
-                         marker=('*'))
-            plt.yscale('log')
-            plt.xscale('log')
-            plt.xlabel('Dilution')
-            plt.ylabel('Intensity')
-            plt.title(plate + '_' + patientid + '_PC4')
-            plt.legend(loc=1)
-            plt.savefig(plate + '_' + patientid + '_PC4')
-            plt.close()
+
+        if patientid != 'Standard':
+
+            if not patientid in os.listdir('.'):
+                os.makedirs(patientid)
+            os.chdir(patientid)
+
+            for test in list_of_columns:
+
+                fig = plt.figure(figsize=(10, 8))
+                plt.plot(mask_dict1[patientid].ix[:, ['Dilution']], mask_dict1[patientid].ix[:, [test]], label='V1',
+                        marker=('o'))
+                if patientid in mask_dict2:
+                    plt.plot(mask_dict2[patientid].ix[:, ['Dilution']], mask_dict2[patientid].ix[:, [test]], label='V2',
+                             marker=('v'))
+                if patientid in mask_dict3:
+                    plt.plot(mask_dict3[patientid].ix[:, ['Dilution']], mask_dict3[patientid].ix[:, [test]], label='V3',
+                             marker=('*'))
+                plt.yscale('log')
+                plt.xscale('log')
+                plt.xlabel('Dilution')
+                plt.ylabel('Intensity')
+                plt.title(plate + '_' + patientid + '_' + test)
+                plt.legend(loc=1)
+                plt.savefig(plate + '_' + patientid + '_' + test)
+                plt.close()
+        os.chdir('..')
 
 
     os.chdir('..')
