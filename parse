@@ -7,8 +7,6 @@ table_ = pd.read_excel('06222016 Staph Array Data.xlsx', sheetname = ['Plate 1',
     # each table is called by its name, for plates after number 5 there is no space between plate and the number
 
 
-# print(table_['Plate 1'])
-
 
 # A for loop going through each table to create columns with patient ID, visit number, and titer
 
@@ -39,10 +37,6 @@ for tablenum in table_:  # tablenum will call each table
         else:
             table_[tablenum].ix[item, "Patient ID"] = table_[tablenum].ix[item, 0][0:5]
 
-# print(table_['Plate 2']['Visit Number'])
-
-
-# print(table_['Plate 4']['Patient ID'])
 
 
 for tablenum in table_:  # tablenum will call each table
@@ -119,14 +113,16 @@ patient27986_mask = moved_27986_dict["Plate9"].ix[3:6,:]
 moved_27986_dict["Plate9"] = moved_27986_dict["Plate9"][moved_27986_dict["Plate9"]["Patient ID"] != "27986"]
 moved_27986_dict["Plate8"]= moved_27986_dict["Plate8"].append(patient27986_mask, ignore_index=True)
 
+graph_count=0
+graph_title=' '
 
 for plate in moved_27986_dict:  # Iterate through each plate
 
-    if not plate in os.listdir('.'):
+    if not plate in os.listdir('.'):  #Create a folder with the plate name for the graphs
         os.makedirs(plate)
     os.chdir(plate)
-    # make a list of patient IDs
 
+    # make a list of patient IDs
     d = moved_27986_dict[plate]
     list_of_patientids = []
     for patient in d["Patient ID"]:
@@ -135,17 +131,17 @@ for plate in moved_27986_dict:  # Iterate through each plate
 
     # make a list of column values
     column_values = list(d.columns.values)
-    list_of_columns = column_values[4:53]
+    if plate == 'Plate11':
+        list_of_columns = column_values[1:50] #Plate 11 has 3 less columns
+    else:
+        list_of_columns = column_values[4:53]
 
-    print(list_of_columns)
-
-    for num1, test in enumerate(list_of_columns):
+    non_period_columns = {}
+    for num1, test in enumerate(list_of_columns):  #Create a dictionary of period column names without their periods
         if '.' in test:
             for num2, letter in enumerate(test):
                 if letter == '.':
-                    list_of_columns[num1] = test[0:num2] + ' ' + test[num2+1:len(test)]
-
-    print(list_of_columns)
+                    non_period_columns[test] = test[0:num2] + ' ' + test[num2+1:len(test)]
 
 
 
@@ -188,30 +184,38 @@ for plate in moved_27986_dict:  # Iterate through each plate
             os.chdir(patientid)
 
             for test in list_of_columns:
-
-                fig = plt.figure(figsize=(10, 8))
-                plt.plot(mask_dict1[patientid].ix[:, ['Dilution']], mask_dict1[patientid].ix[:, [test]], label='V1',
-                        marker=('o'))
-                if patientid in mask_dict2:
-                    plt.plot(mask_dict2[patientid].ix[:, ['Dilution']], mask_dict2[patientid].ix[:, [test]], label='V2',
-                             marker=('v'))
-                if patientid in mask_dict3:
-                    plt.plot(mask_dict3[patientid].ix[:, ['Dilution']], mask_dict3[patientid].ix[:, [test]], label='V3',
-                             marker=('*'))
-                plt.yscale('log')
-                plt.xscale('log')
-                plt.xlabel('Dilution')
-                plt.ylabel('Intensity')
-                plt.title(plate + '_' + patientid + '_' + test)
-                plt.legend(loc=1)
-                plt.savefig(plate + '_' + patientid + '_' + test)
-                plt.close()
-        os.chdir('..')
+                if not (((plate == 'Plate 1' or plate == 'Plate 2') and test == 'BSA') or (plate == 'Plate10' and test == 'Pn PS23')):
+                    print('Plot Count:', graph_count)
+                    print(graph_title)
+                    fig = plt.figure(figsize=(10, 8))
+                    plt.plot(mask_dict1[patientid].ix[:, ['Dilution']], mask_dict1[patientid].ix[:, [test]], label='V1',
+                            marker=('o'))
+                    if patientid in mask_dict2:
+                        plt.plot(mask_dict2[patientid].ix[:, ['Dilution']], mask_dict2[patientid].ix[:, [test]], label='V2',
+                                 marker=('v'))
+                    if patientid in mask_dict3:
+                        plt.plot(mask_dict3[patientid].ix[:, ['Dilution']], mask_dict3[patientid].ix[:, [test]], label='V3',
+                                 marker=('*'))
+                    plt.yscale('log')
+                    plt.xscale('log')
+                    plt.xlabel('Dilution')
+                    plt.ylabel('Intensity')
+                    plt.title(plate + '_' + patientid + '_' + test)
+                    plt.legend(loc=1)
+                    if '.' in test:
+                        plt.savefig(plate + '_' + patientid + '_' + non_period_columns[test])
+                        graph_count += 1
+                        graph_title = plate + '_' + patientid + '_' + non_period_columns[test]
+                    else:
+                        plt.savefig(plate + '_' + patientid + '_' + test)
+                        graph_count += 1
+                        graph_title = plate + '_' + patientid + '_' + test
+                    plt.close()
+            os.chdir('..')
 
 
     os.chdir('..')
 
-
-
+print('Final:', graph_count)
 
 
