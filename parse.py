@@ -69,7 +69,7 @@ Hosp_Dict = {}
 Age_Dict = {}
 Gend_Dict = {}
 
-for tablenum in table_:
+for tablenum in table_: # tablenum will call each table
     for item in range(len(table_[tablenum])):
         if not tablenum == 'Plate11':  # Plate 11 does not have this information
             if not table_[tablenum].ix[item, "Patient ID"] in Hosp_Dict:
@@ -92,6 +92,7 @@ for tablenum in table_:  # tablenum will call each table
             table_[tablenum].ix[item, "Age"] = Age_Dict[table_[tablenum].ix[item, "Patient ID"]]
             table_[tablenum].ix[item, "Gender"] = Gend_Dict[table_[tablenum].ix[item, "Patient ID"]]
 
+# Make new directory of updated files
 if not 'Updated Files' in os.listdir('.'):
     os.makedirs('Updated Files')
 os.chdir('Updated Files')  # Change directory to output new files in updated files folder
@@ -100,6 +101,7 @@ os.chdir('Updated Files')  # Change directory to output new files in updated fil
 for tablenum in table_:
     table_[tablenum].to_csv(tablenum + '.tsv', sep='\t')
 
+# Make new directory for graphs
 os.chdir('..')
 if not 'Graphs' in os.listdir('.'):
     os.makedirs('Graphs')
