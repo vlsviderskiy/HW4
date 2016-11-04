@@ -113,7 +113,6 @@ patient27986_mask = moved_27986_dict["Plate9"].ix[3:6,:]
 moved_27986_dict["Plate9"] = moved_27986_dict["Plate9"][moved_27986_dict["Plate9"]["Patient ID"] != "27986"]
 moved_27986_dict["Plate8"]= moved_27986_dict["Plate8"].append(patient27986_mask, ignore_index=True)
 
-graph_count=0 #Count the number of graphs bieng generated
 
 for plate in moved_27986_dict:  # Iterate through each plate
 
@@ -184,8 +183,6 @@ for plate in moved_27986_dict:  # Iterate through each plate
 
             for test in list_of_columns: #Iterate through each test for plots
                 if not (((plate == 'Plate 1' or plate == 'Plate 2') and test == 'BSA') or (plate == 'Plate10' and test == 'Pn PS23')):
-                    print('Plot Count:', graph_count)
-                    print(graph_title)
                     fig = plt.figure(figsize=(10, 8))
                     plt.plot(mask_dict1[patientid].ix[:, ['Dilution']], mask_dict1[patientid].ix[:, [test]], label='V1',
                             marker=('o'))
@@ -210,7 +207,5 @@ for plate in moved_27986_dict:  # Iterate through each plate
 
 
     os.chdir('..') #Go back to the graphs folder
-
-print('Final:', graph_count)
 
 
