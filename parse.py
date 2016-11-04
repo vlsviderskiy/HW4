@@ -113,8 +113,7 @@ patient27986_mask = moved_27986_dict["Plate9"].ix[3:6,:]
 moved_27986_dict["Plate9"] = moved_27986_dict["Plate9"][moved_27986_dict["Plate9"]["Patient ID"] != "27986"]
 moved_27986_dict["Plate8"]= moved_27986_dict["Plate8"].append(patient27986_mask, ignore_index=True)
 
-graph_count=0
-graph_title=' '
+graph_count=0 #Count the number of graphs bieng generated
 
 for plate in moved_27986_dict:  # Iterate through each plate
 
@@ -179,11 +178,11 @@ for plate in moved_27986_dict:  # Iterate through each plate
 
         if patientid != 'Standard':
 
-            if not patientid in os.listdir('.'):
+            if not patientid in os.listdir('.'):   #Create a folder within each plate for each patient's plots
                 os.makedirs(patientid)
             os.chdir(patientid)
 
-            for test in list_of_columns:
+            for test in list_of_columns: #Iterate through each test for plots
                 if not (((plate == 'Plate 1' or plate == 'Plate 2') and test == 'BSA') or (plate == 'Plate10' and test == 'Pn PS23')):
                     print('Plot Count:', graph_count)
                     print(graph_title)
@@ -204,17 +203,13 @@ for plate in moved_27986_dict:  # Iterate through each plate
                     plt.legend(loc=1)
                     if '.' in test:
                         plt.savefig(plate + '_' + patientid + '_' + non_period_columns[test])
-                        graph_count += 1
-                        graph_title = plate + '_' + patientid + '_' + non_period_columns[test]
                     else:
                         plt.savefig(plate + '_' + patientid + '_' + test)
-                        graph_count += 1
-                        graph_title = plate + '_' + patientid + '_' + test
                     plt.close()
-            os.chdir('..')
+            os.chdir('..') #Go back to the plate folder
 
 
-    os.chdir('..')
+    os.chdir('..') #Go back to the graphs folder
 
 print('Final:', graph_count)
 
